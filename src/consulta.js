@@ -1,4 +1,3 @@
-const { release } = require('os')
 const pool = require('./db')
 const insertar = async (datos) => {
   const consulta = {
@@ -55,10 +54,7 @@ const insertarTarnsferencias = async (datos) => {
     try {
       const inserTransaccion =
         'INSERT INTO transferencias (emisor, receptor, monto, fecha) values ($1, $2, $3, now()) RETURNING*'
-      const ultimaTRansaccion = await client.query(
-        inserTransaccion,
-        datos
-      )
+      const ultimaTRansaccion = await client.query(inserTransaccion, datos)
       const descontar =
         'UPDATE usuarios SET balance = balance - $1 WHERE id = $2'
       await client.query(descontar, [monto, emisor])
@@ -81,7 +77,7 @@ const insertarTarnsferencias = async (datos) => {
 
 const consultarTransferencias = async () => {
   const consulta = {
-    text: 'SELECT fecha, nombreemisor.nombre, nombrereceptor.nombre, monto FROM transferencias AS t INNER JOIN usuarios AS nombreemisor ON t.emisor = nombreemisor.id INNER JOIN usuarios AS nombrereceptor ON t.receptor = nombrereceptor.id;',
+    text: 'SELECT fecha, nombreemisor.nombre, nombrereceptor.nombre, monto FROM transferencias AS transf INNER JOIN usuarios AS nombreemisor ON transf.emisor = nombreemisor.id INNER JOIN usuarios AS nombrereceptor ON transf.receptor = nombrereceptor.id;',
     rowMode: 'array',
   }
   try {
